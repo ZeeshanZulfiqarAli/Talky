@@ -1,0 +1,92 @@
+@use 'sass:map';
+
+@import 'variables.scss';
+@import '~bootstrap/scss/bootstrap';
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    height: 100%;
+    min-height: 100%;
+}
+
+#__next {
+    height: 100%;
+    min-height: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+button.btn-outline-primary.btn:hover > svg > path {
+    stroke: #000;
+}
+
+/* Firefox */
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-down($breakpoint) {
+        .border-#{$breakpoint}-left-none {
+            border-left: none !important;
+        }
+        .border-#{$breakpoint}-right-none {
+            border-right: none !important;
+        }
+        .border-#{$breakpoint}-top-none {
+            border-top: none !important;
+        }
+        .border-#{$breakpoint}-bottom-none {
+            border-bottom: none !important;
+        }
+        .w-#{$breakpoint}-none {
+            width: 0 !important;
+        }
+        .w-#{$breakpoint}-100 {
+            width: 100% !important;
+        }
+        .mw-#{$breakpoint}-0 {
+            max-width: 0 !important;
+        }
+        .shadow-#{$breakpoint}-none {
+            box-shadow: none !important;
+        }
+        .bg-#{$breakpoint}-none {
+            background: none !important;
+        }
+        .mt-#{$breakpoint}-5 {
+            margin-top: 3rem !important;
+        }
+        .justify-content-center-#{$breakpoint} {
+            justify-content: center !important;
+        }
+        .justify-content-end-#{$breakpoint} {
+            justify-content: end !important;
+        }
+        .position-fixed-#{$breakpoint} {
+            position: fixed;
+        }
+    }
+}
