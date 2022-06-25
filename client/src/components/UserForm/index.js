@@ -1,60 +1,78 @@
-import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import {SocketContext} from '../../context/socket';
+import React, { useContext, useEffect, useState } from "react";
+
+import classNames from "classnames";
+
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+
+import { SocketContext } from "../../context/socket";
+import styles from "./styles.module.scss";
 
 function UserForm({ setName }) {
-    const inputRef = useRef(null);
-    const [error, setError] = useState('');
-    const [inProgress, setInProgress] = useState(false);
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
+  const [inProgress, setInProgress] = useState(false);
 
-    const socket = useContext(SocketContext);
+  const socket = useContext(SocketContext);
 
-    const handleOnSubmit = useCallback((e) => {
-        e.preventDefault();
-        setInProgress(true);
+  const handleOnSubmit = () => {
+    setInProgress(true);
+    console.log("1");
+    socket.emit("name", username);
+  };
 
-        const value = inputRef.current.value;
-        socket.emit('name', value);
-        // console.log(e, inputRef.current.value);
-    }, [inputRef.current]);
+  const handleOnChange = (e) => {
+    setUsername(e.target.value);
+    setError("");
+  };
 
-    const handleOnChange = () => {
-        setError('');
-    }
+  useEffect(() => {
+    socket.on("username exists", () => {
+      console.log("2", username);
+      setUsername("");
+      setError(`Username ${username} exists already`);
+      setInProgress(false);
+    });
 
-    useEffect(() => {
-        if (!inputRef.current) return;
+    socket.on("username assigned", () => {
+      console.log("3");
+      setInProgress(false);
+      setName(username);
+      setUsername("");
+    });
 
-        socket.on('username exists', () => {
-            inputRef.current.value = '';
-            setError('username exists already');
-            setInProgress(false);
-        })
+    return () => {
+      console.log("4");
+      socket.off("username exists");
+      socket.off("username assigned");
+    };
+  }, [username]);
 
-        socket.on('username assigned', () => {
-            const value = inputRef.current.value;
-            inputRef.current.value = '';
-            setInProgress(false);
-            setName(value);
-        })
-
-        return () => {
-            socket.off('username exists');
-            socket.off('username assigned');
-        }
-    }, [inputRef.current]);
-
-    return (
-        <Fragment>
-            <h2>Your username</h2>
-            <form onSubmit={handleOnSubmit}>
-                {
-                    error && (<div className="error_message">{error}</div>)
-                }
-                <input type='text' ref={inputRef} disabled={inProgress} onChange={handleOnChange}/>
-                <button type='submit'>Submit</button>
-            </form>
-        </Fragment>
-    )
+  return (
+    <>
+      <h2>Your username</h2>
+      <div className="d-flex">
+        <Form.Control
+          size="md"
+          type="text"
+          disabled={inProgress}
+          value={username}
+          onChange={handleOnChange}
+          onKeyPress={(e) => e.key === "Enter" && handleOnSubmit()}
+          className="d-inline w-40"
+        />
+        <Button
+          type="submit"
+          disabled={!username || inProgress}
+          className={classNames(styles.submitBtn, "ms-2 border-0")}
+          onClick={handleOnSubmit}
+        >
+          Submit
+        </Button>
+      </div>
+      {error && <div className="fst-italic fw-light">{error}</div>}
+    </>
+  );
 }
 
 export default UserForm;

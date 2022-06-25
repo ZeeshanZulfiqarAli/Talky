@@ -1,0 +1,36 @@
+.submitBtn {
+    outline: none;
+    // border: none;
+}
+
+.chatContainer {
+    height: 60vh;
+
+    .allMessageContainer {
+        height: 60vh;
+    }
+
+    .messageContainer {
+        display: flex;
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        &.ourMessage {
+            margin-right: 15px;
+            text-align: end;
+            justify-content: flex-end;
+        }
+    
+        &.theirMessage {
+            margin-left: 15px;
+            text-align: start;
+            justify-content: flex-start;
+        }
+
+        .content {
+            max-width: 30rem;
+        }
+    }
+
+
+}

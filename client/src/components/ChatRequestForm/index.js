@@ -1,62 +1,78 @@
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react';
-import {SocketContext} from '../../context/socket';
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-function ChatRequestForm({ setName2: setName, setAnswer }) {
-    const inputRef = useRef(null);
-    const [error, setError] = useState('');
-    const [inProgress, setInProgress] = useState(false);
+import classNames from "classnames";
 
-    const socket = useContext(SocketContext);
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
+import { SocketContext } from "../../context/socket";
+import styles from "./styles.module.scss";
 
-    const handleOnSubmit = (e) => {
-        e.preventDefault();
-        setInProgress(true);
+function ChatRequestForm({ setName2: setName, setAnswer, disabled }) {
+  const [requestUsername, setRequestUsername] = useState("");
+  const [error, setError] = useState("");
+  const [inProgress, setInProgress] = useState(false);
 
-        const value = inputRef.current.value;
-        if (value === "") return;
-        socket.emit('request answer', value);
+  const socket = useContext(SocketContext);
 
-        
-        // console.log(e, inputRef.current.value);
-    };
+  const handleOnSubmit = () => {
+    // TODO: prevent submitting user's own username
+    setInProgress(true);
 
-    const handleOnChange = () => {
-        setError('');
-    }
+    socket.emit("request answer", requestUsername);
 
-    useEffect(() => {
-        socket.on('error', () => {
-            inputRef.current.value = '';
-            setError('username not found');
-            setInProgress(false);
-        })
+  };
 
-        socket.on('answer', (name, answer) => {
-            inputRef.current.value = '';
-            setInProgress(false);
-            setName(name);
-            setAnswer(answer);
-        })
+  const handleOnChange = (e) => {
+    setRequestUsername(e.target.value);
+    setError("");
+  };
 
-        return () => {
-            socket.off('error');
-            socket.off('answer');
-        };
+  useEffect(() => {
+    socket.on("error", () => {
+      setRequestUsername("");
+      setError("username not found");
+      setInProgress(false);
     });
 
-    return (
-        <Fragment>
-            <h2>Friend's username</h2>
-            <form onSubmit={handleOnSubmit}>
-                {
-                    error && (<div className="error_message">{error}</div>)
-                }
-                <input type='text' ref={inputRef} disabled={inProgress} onChange={handleOnChange}/>
-                <button type='submit'>Submit</button>
-            </form>
-        </Fragment>
-    )
+    socket.on("answer", (name, answer) => {
+      setRequestUsername("");
+      setInProgress(false);
+      setName(name);
+      setAnswer(answer);
+    });
+
+    return () => {
+      socket.off("error");
+      socket.off("answer");
+    };
+  });
+
+  return (
+    <>
+      <h2>Friend's username</h2>
+      <div className="d-flex">
+        <Form.Control
+          size="md"
+          type="text"
+          disabled={inProgress || disabled}
+          onChange={handleOnChange}
+          value={requestUsername}
+          onKeyPress={(e) => e.key === "Enter" && handleOnSubmit()}
+          className="d-inline w-40"
+        />
+        <Button
+          type="submit"
+          disabled={!requestUsername || inProgress || disabled}
+          className={classNames(styles.submitBtn, "ms-2 border-0")}
+          onClick={handleOnSubmit}
+        >
+          Submit
+        </Button>
+      </div>
+      {error && <div className="fst-italic fw-light">{error}</div>}
+    </>
+  );
 }
 
 export default ChatRequestForm;

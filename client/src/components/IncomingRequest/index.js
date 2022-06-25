@@ -1,8 +1,10 @@
-import React, { Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+
+import Button from "react-bootstrap/Button";
+
 import {SocketContext} from '../../context/socket';
 
-function IncomingRequest({ generateAnswer, setName2, createDataChannel }) {
-    const [incomingRequestData, setIncomingRequestData] = useState(null);
+function IncomingRequest({ incomingRequestData, setIncomingRequestData, generateAnswer, setName2, createDataChannel }) {
     const socket = useContext(SocketContext);
 
     const handleOnClickAccept = useCallback(async () => {
@@ -28,11 +30,11 @@ function IncomingRequest({ generateAnswer, setName2, createDataChannel }) {
 
     return (
         incomingRequestData &&
-            <Fragment>
+            <div className='mt-3'>
                 <h4>You've an incomming request from {incomingRequestData.name}</h4>
-                <button onClick={handleOnClickAccept}>Accept</button>
-                <button onClick={handleOnClickReject}>Reject</button>
-            </Fragment>
+                <Button className="me-2" onClick={handleOnClickAccept}>Accept</Button>
+                <Button onClick={handleOnClickReject}>Reject</Button>
+            </div>
     )
 }
 

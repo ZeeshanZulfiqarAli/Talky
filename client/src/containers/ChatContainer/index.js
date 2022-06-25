@@ -1,47 +1,82 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from "react";
 
-function ChatContainer({dataChannel, name2}) {
-    const [messsages, setMessages] = useState([]);
-    const inputRef = useRef(null);
+import classNames from "classnames";
 
-    const send = useCallback((e) => {
-        const value = inputRef.current.value;
-        if (value === "" || !dataChannel) return;
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Card from "react-bootstrap/Card";
+import Container from "react-bootstrap/Container";
 
-        dataChannel.send(value);
-        setMessages(messages => [...messages, {text: value, our: true}]);
-        inputRef.current.value = '';
+import styles from "./styles.module.scss";
 
-    }, [dataChannel, inputRef.current]);
+function ChatContainer({ dataChannel, name2 }) {
+  const [messsages, setMessages] = useState([]);
+  const [text, setText] = useState("");
 
-    useEffect(() => {
-        if (!dataChannel) return;
+  const handleOnChange = (e) => {
+    setText(e.target.value);
+  };
 
-        dataChannel.onmessage = (event) => {
-            setMessages(messages => [...messages, {text: event.data, our: false}]);
-        };
+  const send = (e) => {
+    if (text === "" || !dataChannel) return;
 
-        return () => {
-            dataChannel.onmessage = undefined;
-        }
-    }, [dataChannel]);
+    dataChannel.send(text);
+    setMessages((messages) => [...messages, { text, our: true }]);
+    setText("");
+  };
 
-    return (
-        <div>
-            <h2>chatting with {name2}</h2>
-            <ul>
-                {
-                    messsages.map((message, idx) => 
-                        <li className={message.our ? 'our' : 'their'} key={idx}>{message.text}</li>
-                    )
-                }
-            </ul>
-            <div>
-                <input ref={inputRef} placeholder="write message here"/>
-                <button onClick={send}>Send</button>
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    if (!dataChannel) return;
+
+    dataChannel.onmessage = (event) => {
+      setMessages((messages) => [
+        ...messages,
+        { text: event.data, our: false },
+      ]);
+    };
+
+    return () => {
+      dataChannel.onmessage = undefined;
+    };
+  }, [dataChannel]);
+
+  return (
+    <div>
+      <h2>chatting with {name2}</h2>
+      <Container>
+        <Card className={classNames(styles.chatContainer, 'justify-content-between')}>
+          <div className={classNames(styles.allMessageContainer, "overflow-scroll")}>
+            {messsages.map((message, idx) => (
+                <div className={classNames(styles.messageContainer, {[styles.ourMessage]: message.our, [styles.theirMessage]: !message.our})}>
+              <div className={styles.content} key={idx}>
+                {message.text}
+              </div>
+              </div>
+            ))}
+          </div>
+          <div className="d-flex">
+            <Form.Control
+              size="md"
+              type="text"
+              placeholder="write message here"
+              value={text}
+              onChange={handleOnChange}
+              onKeyPress={(e) => e.key === "Enter" && send()}
+              className="d-inline"
+            />
+            <Button
+              type="submit"
+              disabled={!text}
+              className={classNames(styles.submitBtn, "ms-2 border-0")}
+              onClick={send}
+            >
+              Submit
+            </Button>
+          </div>
+        </Card>
+      </Container>
+    </div>
+  );
 }
 
 export default ChatContainer;
