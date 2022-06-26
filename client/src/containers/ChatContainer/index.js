@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import classNames from "classnames";
 
@@ -10,8 +10,9 @@ import Container from "react-bootstrap/Container";
 import styles from "./styles.module.scss";
 
 function ChatContainer({ dataChannel, name2 }) {
-  const [messsages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const allMessageContainerRef = useRef(null);
 
   const handleOnChange = (e) => {
     setText(e.target.value);
@@ -24,6 +25,25 @@ function ChatContainer({ dataChannel, name2 }) {
     setMessages((messages) => [...messages, { text, our: true }]);
     setText("");
   };
+
+  useEffect(() => {
+    // update scroll position
+    if (!allMessageContainerRef.current) return;
+    // solution sourced from https://stackoverflow.com/a/21067431
+
+    // TODO: make the auto scroll to bottom more flexible and
+    // aware if user has scrolled up by themselves or not
+    if (
+      // allMessageContainerRef.current.scrollHeight -
+      //   allMessageContainerRef.current.clientHeight <=
+      // allMessageContainerRef.current.scrollTop + 1
+      true
+    ) {
+      allMessageContainerRef.current.scrollTop =
+        allMessageContainerRef.current.scrollHeight -
+        allMessageContainerRef.current.clientHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!dataChannel) return;
@@ -44,13 +64,30 @@ function ChatContainer({ dataChannel, name2 }) {
     <div>
       <h2>chatting with {name2}</h2>
       <Container>
-        <Card className={classNames(styles.chatContainer, 'justify-content-between')}>
-          <div className={classNames(styles.allMessageContainer, "overflow-scroll")}>
-            {messsages.map((message, idx) => (
-                <div className={classNames(styles.messageContainer, {[styles.ourMessage]: message.our, [styles.theirMessage]: !message.our})}>
-              <div className={styles.content} key={idx}>
-                {message.text}
-              </div>
+        <Card
+          className={classNames(
+            styles.chatContainer,
+            "justify-content-between h-auto"
+          )}
+        >
+          <div
+            className={classNames(
+              styles.allMessageContainer,
+              "overflow-scroll"
+            )}
+            ref={allMessageContainerRef}
+          >
+            {messages.map((message, idx) => (
+              <div
+                className={classNames(styles.messageContainer, {
+                  [styles.ourMessage]: message.our,
+                  [styles.theirMessage]: !message.our,
+                })}
+                key={idx}
+              >
+                <div className={styles.content}>
+                  {message.text}
+                </div>
               </div>
             ))}
           </div>
@@ -67,7 +104,10 @@ function ChatContainer({ dataChannel, name2 }) {
             <Button
               type="submit"
               disabled={!text}
-              className={classNames(styles.submitBtn, "ms-2 border-0 cursor-pointer")}
+              className={classNames(
+                styles.submitBtn,
+                "ms-2 border-0 cursor-pointer"
+              )}
               onClick={send}
             >
               Submit

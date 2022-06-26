@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import logo from "./logo.svg";
-import Customers from "./components/customers";
 import LayoutContainer from "./containers/LayoutContainer";
 import ChatContainer from "./containers/ChatContainer";
 import UserForm from "./components/UserForm";
