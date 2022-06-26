@@ -67,7 +67,7 @@ function ChatContainer({ dataChannel, name2 }) {
             <Button
               type="submit"
               disabled={!text}
-              className={classNames(styles.submitBtn, "ms-2 border-0")}
+              className={classNames(styles.submitBtn, "ms-2 border-0 cursor-pointer")}
               onClick={send}
             >
               Submit

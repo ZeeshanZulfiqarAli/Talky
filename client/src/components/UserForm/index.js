@@ -64,7 +64,7 @@ function UserForm({ setName }) {
         <Button
           type="submit"
           disabled={!username || inProgress}
-          className={classNames(styles.submitBtn, "ms-2 border-0")}
+          className={classNames(styles.submitBtn, "ms-2 border-0 cursor-pointer")}
           onClick={handleOnSubmit}
         >
           Submit

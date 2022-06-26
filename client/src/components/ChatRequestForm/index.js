@@ -64,7 +64,7 @@ function ChatRequestForm({ setName2: setName, setAnswer, disabled }) {
         <Button
           type="submit"
           disabled={!requestUsername || inProgress || disabled}
-          className={classNames(styles.submitBtn, "ms-2 border-0")}
+          className={classNames(styles.submitBtn, "ms-2 border-0 cursor-pointer")}
           onClick={handleOnSubmit}
         >
           Submit

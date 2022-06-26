@@ -32,8 +32,8 @@ function IncomingRequest({ incomingRequestData, setIncomingRequestData, generate
         incomingRequestData &&
             <div className='mt-3'>
                 <h4>You've an incomming request from {incomingRequestData.name}</h4>
-                <Button className="me-2" onClick={handleOnClickAccept}>Accept</Button>
-                <Button onClick={handleOnClickReject}>Reject</Button>
+                <Button className="me-2 cursor-pointer" onClick={handleOnClickAccept}>Accept</Button>
+                <Button className="cursor-pointer" onClick={handleOnClickReject}>Reject</Button>
             </div>
     )
 }
